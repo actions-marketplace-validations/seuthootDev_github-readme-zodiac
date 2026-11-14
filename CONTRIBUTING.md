@@ -28,7 +28,7 @@ Beyond the default 12-sign look, feel free to propose:
 - **Copy & flavor text** — zodiac titles, descriptions, taglines, or tone variants
 - **Role / identity mapping** — better auto-role guesses, sign-flavored role suggestions, locale-friendly labels
 - **Pin (Gist) presentation** — constellation fidelity (above), clearer 5-line layouts, safer monospace art
-- **Docs & DX** — clearer fork setup, examples, previews, translations of docs
+- **Docs & DX** — clearer Action setup, examples, previews, translations of docs
 - **Themes & options** — query params, named themes, light/dark variants (keep defaults stable)
 
 If you are unsure whether an idea fits, **open an issue first** — we would rather chat than see you rebuild something in the wrong direction.

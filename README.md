@@ -62,12 +62,12 @@ Sister project (Asian zodiac): [github-readme-chinese-zodiac](https://github.com
 
 ## Bonus: pin it as a Gist
 
-Prefer your profile **Pins** over the README? A fork-based GitHub Action (like [productive-box](https://github.com/maxam2017/productive-box)) can keep a text version of the card in a pinned Gist.
+Prefer your profile **Pins** over the README? This repo is also a [GitHub Action](https://github.com/marketplace/actions/zodiac-dev-card-gist) that keeps a text version of the card in a pinned Gist — no fork needed.
 
 | Mode | Where it appears | Setup |
 |------|------------------|--------|
 | **SVG card** | Profile **README** | One URL (above) |
-| **Pinned Gist** | Profile **Pins** | Fork + token + Action (below) |
+| **Pinned Gist** | Profile **Pins** | Token + one workflow file (below) |
 
 ### What a Pin looks like
 
@@ -93,75 +93,52 @@ Open the Gist itself to see the **full** card (description + tagline under the p
 
 #### How to put this on your profile Pins
 
-Same pattern as [productive-box](https://github.com/maxam2017/productive-box): **fork → Action fills your Gist → pin that Gist**. No Vercel for Pins.
-
-1. **[Fork this repo](https://github.com/seuthootDev/github-readme-zodiac/fork)**
-2. Create a **public** [Gist](https://gist.github.com/) and copy its ID  
+1. Create a **public** [Gist](https://gist.github.com/) (any filename, placeholder text) and copy its ID  
    (`https://gist.github.com/YOU/`**`GIST_ID`** — not the `.js` embed URL)
-3. Create a PAT with **`gist`** scope → on **your fork**, add Secrets `GH_TOKEN` + `GIST_ID`
-4. On **your fork**, add Variable `BIRTHDATE` = `YYYY-MM-DD` (optional but recommended)
+2. Create a [classic token](https://github.com/settings/tokens) with only the **`gist`** scope (shown once — save it; the same token works for the [Asian sister action](https://github.com/seuthootDev/github-readme-chinese-zodiac))
+3. In any repo you own (your `USERNAME/USERNAME` profile repo is a good home), add Secrets `GH_TOKEN` (the token) and `GIST_ID`  
+   **Settings → Secrets and variables → Actions → New repository secret**
+4. Add `.github/workflows/zodiac-gist.yml`:
+
+```yaml
+name: Update Zodiac Gist
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *" # daily, 00:00 UTC
+
+jobs:
+  update-gist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: seuthootDev/github-readme-zodiac@v1
+        with:
+          gh_token: ${{ secrets.GH_TOKEN }}
+          gist_id: ${{ secrets.GIST_ID }}
+          birthdate: "1995-04-24" # optional — picks your sign
+```
+
 5. **Actions** → **Update Zodiac Gist** → **Run workflow**
 6. [Pin the Gist](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/pinning-items-to-your-profile) on your profile
 
-Details (secrets table, variables, schedule): **[Fork setup](#fork-setup)** below.
+#### Inputs
 
-### Fork setup
+| Input | Required | Notes |
+|-------|----------|-------|
+| `gh_token` | yes | PAT with `gist` scope — pass it from a secret |
+| `gist_id` | yes | Gist ID only |
+| `birthdate` | no | `YYYY-MM-DD` → sign |
+| `sign` | no | force a sign, e.g. `leo` |
+| `username` | no | GitHub login (default: token owner) |
+| `name` / `role` | no | display overrides |
 
-**Recommended:** fork this repo and run the Action on **your fork**.
-
-#### 1. Fork
-
-Fork [seuthootDev/github-readme-zodiac](https://github.com/seuthootDev/github-readme-zodiac).
-
-#### 2. Create a public Gist
-
-1. https://gist.github.com/  
-2. Filename e.g. `zodiac.md`, any placeholder text  
-3. **Create public gist**  
-4. Copy only the **Gist ID** (not the `.js` embed URL):  
-   `https://gist.github.com/YOU/`**`GIST_ID`**
-
-#### 3. Create a token (once)
-
-https://github.com/settings/tokens → **Tokens (classic)** → enable **`gist`** only.  
-The token string is shown **once** — save it. The same PAT can be reused on the Asian sister project.
-
-#### 4. Secrets and Variables on **your fork**
-
-**Settings → Secrets and variables → Actions**
-
-**Secrets** tab:
-
-| Secret | Value |
-|--------|--------|
-| `GH_TOKEN` | PAT with `gist` scope |
-| `GIST_ID` | Gist ID only (see above) |
-
-**Variables** tab (optional but recommended):
-
-| Variable | Value | Notes |
-|----------|--------|--------|
-| `BIRTHDATE` | `YYYY-MM-DD` | e.g. `1995-04-24` → zodiac sign |
-| `USERNAME` | your GitHub login | default: token owner |
-| `SIGN` | `scorpio` | force a sign |
-| `NAME` | display name | optional override |
-| `ROLE` | `Backend Dev` | optional override |
-
-> Birthdate is a **Variable** (`BIRTHDATE`), not a Secret.  
-> Path: Settings → Secrets and variables → Actions → **Variables** → New repository variable.
-
-#### 5. Run the Action
-
-1. On **your fork**: **Actions** → enable workflows if prompted  
-2. **Update Zodiac Gist** → **Run workflow**  
-3. [Pin the Gist on your profile](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/pinning-items-to-your-profile)
-
-Also runs on every push to `main` and daily at 00:00 UTC.
+The token is used only to read your public stats and write that one Gist.
 
 #### Pin vs SVG
 
-| Feature | Your fork’s Action? | Uses [github-readme-zodiac.vercel.app](https://github-readme-zodiac.vercel.app)? |
-|---------|---------------------|----------------------------------------------------------------------------------|
+| Feature | Action? | Uses [github-readme-zodiac.vercel.app](https://github-readme-zodiac.vercel.app)? |
+|---------|---------|----------------------------------------------------------------------------------|
 | **Pinned Gist** | Yes | No |
 | **SVG in README** | No | Yes (shared public instance), unless you deploy your own |
 
@@ -191,10 +168,10 @@ The footer shows your **current streak** and **contributions this year**. This n
 
 ## How it works
 
-**Pinned Gist (fork)**
+**Pinned Gist (Action)**
 
 ```
-Your fork → GitHub Action
+Your workflow → this Action
   → GitHub API (your profile)
   → Zodiac + stats
   → PATCH your Gist
@@ -267,7 +244,7 @@ Third-party artwork remains under its Magnific license (see certificates above);
 - [x] Birthdate mapping + GitHub REST stats
 - [x] Editable name / role (auto by default)
 - [x] Pinned Gist Action (productive-box style)
-- [x] Fork-based pin setup guide
+- [x] Marketplace Action for pins (no fork)
 - [ ] Pin constellation ASCII closer to real figures ([help wanted](CONTRIBUTING.md#help-wanted-pinned-gist-polish-highest-priority))
 - [x] Daily dev forecast + GraphQL contributions / streak
 - [ ] Optional self-host docs for high SVG traffic

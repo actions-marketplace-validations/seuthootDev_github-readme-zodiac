@@ -1,9 +1,32 @@
-name: GitHub Readme Zodiac Gist
-description: Update a pinned Gist with your Developer Zodiac card (productive-box style)
+name: Zodiac Dev Card Gist
+description: Keep a pinned Gist updated with your Western zodiac developer card, built from your GitHub activity
 author: seuthootDev
 branding:
   icon: star
   color: purple
+
+inputs:
+  gh_token:
+    description: Personal access token with the `gist` scope (store it as a secret)
+    required: true
+  gist_id:
+    description: ID of the public Gist to update (the last part of the Gist URL)
+    required: true
+  username:
+    description: "GitHub login to build the card for (default: the token owner)"
+    required: false
+  birthdate:
+    description: Birthdate as YYYY-MM-DD; picks your sign
+    required: false
+  sign:
+    description: Force a sign (aries, taurus, gemini, cancer, leo, virgo, libra, scorpio, sagittarius, capricorn, aquarius, pisces)
+    required: false
+  name:
+    description: Display name override
+    required: false
+  role:
+    description: Role / title override
+    required: false
 
 runs:
   using: node24
